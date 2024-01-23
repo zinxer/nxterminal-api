@@ -1,8 +1,13 @@
 {
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
+    "target": "es6",  // Or a higher version, depending on your Node.js version
+    "module": "commonjs",
+    "lib": ["es2015"], // Or higher
+    "esModuleInterop": true,
     "rootDir": ".",
-    "outDir": "build"
+    "outDir": "build",
+    "types": ["node"],
   },
   "include": [
     "src/**/*.ts",
