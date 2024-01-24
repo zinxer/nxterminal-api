@@ -20,13 +20,12 @@ export async function getKlines(req: Request, res: Response): Promise<void> {
         if (symbolRow.provider === 'binance') {
             let klines = await getBinanceKlines(req)
             res.status(200).json(klines)
+        } else {
+            res.status(400).json({
+                "success": false,
+                "error": { "code": errorCodes.ERROR_CODE_SERVER_FAILED, message: `Unable to find to process request.` }
+            })
         }
-
-        res.status(400).json({
-            "success": false,
-            "error": { "code": errorCodes.ERROR_CODE_SERVER_FAILED, message: `Unable to find to process request.` }
-        })
-        return
     } catch (error) {
         res.status(500).json({
             "success": false,

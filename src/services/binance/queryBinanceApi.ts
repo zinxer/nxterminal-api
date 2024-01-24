@@ -19,11 +19,9 @@ export async function getBinanceKlines(req: Request) {
     try {
         const response = await axios.get(url);
         let processedKlinesData = processKlinesData(response.data)
-        if (processedKlinesData) {
-            return processedKlinesData
-        } else {
-            return response.data;
-        }
+        if (processedKlinesData) { return processedKlinesData }
+
+        return response.data
     } catch (error) {
         console.error(`-E- Unable to retrieve klines market data from Binance`, error)
     }
