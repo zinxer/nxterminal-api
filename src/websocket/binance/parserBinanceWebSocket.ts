@@ -2,8 +2,10 @@
 export function processDataForType(type: string) {
     if (type === 'trade') {
       return processTradeData;
-    } else if (type === 'orderbook') {
+    } else if (type.includes('depth')) {
       return processOrderBookData;
+    } else if (type.includes('kline')){
+        return processKlineData;
     }
   
     return (rawData: string) => rawData;
@@ -41,6 +43,12 @@ function processTradeData(rawData: string): string {
 function processOrderBookData(rawData: string): string {
     // Assuming the rawData is a JSON string
     const data = JSON.parse(rawData);
-    //console.log("Received orderbook data", data)
+    //console.log("Received depth data", data)
+    return rawData;
+}
+
+function processKlineData(rawData: string): string {
+    // Assuming the rawData is a JSON string
+    const data = JSON.parse(rawData);
     return rawData;
 }

@@ -54,7 +54,6 @@ export function setupBinanceWebSocket(symbol: string, type: string, wss: WebSock
 }
 
 function getBinanceWsUrl(symbol: string, type: string): string {
-    if (type == "orderbook") { type = "depth" }
     return `${process.env.BINANCE_WSS_BASEURL}${symbol}@${type}`;
 }
 

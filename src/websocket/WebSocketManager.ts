@@ -20,7 +20,7 @@ export async function setupWebSocketManager(server: HttpServer) {
             const symbol = params.get('symbol');
             const type = params.get('type');
 
-            if (symbol && (type === 'trade' || type === 'orderbook')) {
+            if (symbol !== null && type !== null && isValidWsRequestType(type)) {
                 const wss = await getWebSocketServer(symbol, type, socket);
                 if (wss) {
                     wss.handleUpgrade(request, socket, head, (ws) => {
@@ -38,6 +38,12 @@ export async function setupWebSocketManager(server: HttpServer) {
     console.log("-I- WebSocket setup complete");
 }
 
+function isValidWsRequestType(type: string) {
+    // TODO: provider ticker type wss data
+    const validTypes = ['trade', 'depth', 'kline', 'ticker'] // Add more types as needed
+    return validTypes.some(validTypes => type.includes(validTypes))
+}
+
 async function getWebSocketServer(symbol: string, type: string, socket: NetSocket): Promise<WebSocketServer | null> {
     // check if websocket for this had already been established
     const key = `${symbol}-${type}`;
@@ -47,7 +53,7 @@ async function getWebSocketServer(symbol: string, type: string, socket: NetSocke
 
         // Check if symbol exists and what provider it is.
         try {
-            let symbolRow = await Symbol.findOne({ where: { symbol: symbol } });
+            let symbolRow = await Symbol.findOne({ where: { symbol: symbol, isActive: true } });
             if (symbolRow) {
                 if (symbolRow.provider === 'binance') {
                     console.log(`-I- Setting up "${symbol}-${type}" websocket server from ${symbolRow.provider}.`)
