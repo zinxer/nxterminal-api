@@ -5,7 +5,7 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import requestIp from 'request-ip';
-import { setupWebSocketManager } from './src/websocket/WebSocketManager';
+import { setupWebSocketManager } from './src/websocket/webSocketManager';
 import routes from './src/routes'
 
 const app = express();
