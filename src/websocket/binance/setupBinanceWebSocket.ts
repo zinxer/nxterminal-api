@@ -1,18 +1,21 @@
 import WebSocket, { Server as WebSocketServer } from 'ws';
 import { processDataForType } from './parserBinanceWebSocket'
 
+// DB declaration
+import Config from '../../models/configs';
+
 let reconnectInterval: NodeJS.Timeout | null = null;
 let reconnectAttempts = 0;
 const connectedClientsByType = new Map<string, Set<WebSocket>>();
 
-export function setupBinanceWebSocket(symbol: string, type: string, wss: WebSocketServer) {
+export async function setupBinanceWebSocket(symbol: string, type: string, wss: WebSocketServer) {
     // Keep track on number of client connection by symbol and type => key
     const key = `${symbol}-${type}`
     if (!connectedClientsByType.has(key)) {
         connectedClientsByType.set(key, new Set());
     }
 
-    const binanceWsUrl = getBinanceWsUrl(symbol, type)
+    const binanceWsUrl = await getBinanceWsUrl(symbol, type)
     const processData = processDataForType(type)
     const binanceWs = new WebSocket(binanceWsUrl);
 
@@ -53,8 +56,11 @@ export function setupBinanceWebSocket(symbol: string, type: string, wss: WebSock
     });
 }
 
-function getBinanceWsUrl(symbol: string, type: string): string {
-    return `${process.env.BINANCE_WSS_BASEURL}${symbol}@${type}`;
+async function getBinanceWsUrl(symbol: string, type: string): Promise<string> {
+
+    // Retrieve BINANCE SPOT WSS BASEURL
+    const baseUrl = (await Config.findOne({ where: { key: 'BINANCE_SPOT_WSS_BASEURL' } }))?.value;
+    return `${baseUrl}${symbol}@${type}`;
 }
 
 function broadcastToClients(wss: WebSocketServer, data: string): void {

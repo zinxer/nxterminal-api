@@ -3,12 +3,18 @@ import axios from 'axios';
 
 import { processKlinesData } from './parserBinanceApi'
 
+// DB declaration
+import Config from '../../models/configs';
+
 export async function getBinanceKlines(req: Request) {
     const symbol = (req.query.symbol as string).toUpperCase()
     const interval = req.query.interval
 
+    // Retrieve BINANCE SPOT API BASEURL
+    const baseUrl = (await Config.findOne({ where: { key: 'BINANCE_SPOT_API_BASEURL' } }))?.value;
+
     // Construct the base URL
-    let url = `${process.env.BINANCE_API_BASEURL}uiKlines?symbol=${symbol}&interval=${interval}`;
+    let url = `${baseUrl}uiKlines?symbol=${symbol}&interval=${interval}`;
 
     // Append optional parameters if they are provided
     if (req.query.startTime) url += `&startTime=${req.query.startTime}`;
