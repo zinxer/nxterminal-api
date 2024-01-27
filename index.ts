@@ -5,7 +5,6 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import requestIp from 'request-ip';
-import { setupWebSocketManager } from './src/websocket/webSocketManager';
 import routes from './src/routes'
 
 const app = express();
@@ -21,9 +20,6 @@ app.use(requestIp.mw());
 
 // Setup Routes
 app.use(routes);
-
-// Set up WebSocket handling
-setupWebSocketManager(server); // Pass the HTTP server to WebSocket setup
 
 // Check that database is authenticated
 sequelize.authenticate()

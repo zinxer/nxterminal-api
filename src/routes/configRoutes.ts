@@ -1,10 +1,10 @@
 import express from 'express';
-import { getKlines } from '../controllers/marketDataController';
+import { getSetupConfig } from '../controllers/configController';
 import { validateMandatoryParams } from '../middleware/validationMiddleware';
 
 const router = express.Router();
 
 // Define routes
-router.get('/klines', validateMandatoryParams(['symbol', 'interval']), getKlines)
+router.get('/setup', getSetupConfig)
 
 export default router;

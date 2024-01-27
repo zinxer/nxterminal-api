@@ -4,14 +4,14 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     return queryInterface.bulkInsert('configs', [
       {
-        key: 'BINANCE_SPOT_WSS_BASEURL',
-        value: 'wss://stream.binance.com:9443/ws/',
+        key: 'WSS_BASEURL',
+        value: `ws://localhost:3000/ws`,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        key: 'BINANCE_SPOT_API_BASEURL',
-        value: 'https://api.binance.com/api/v3/',
+        key: 'API_BASEURL',
+        value: `http://localhost:3000/api/`,
         createdAt: new Date(),
         updatedAt: new Date(),
       }

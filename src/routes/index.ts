@@ -1,10 +1,10 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { validatePayload, setRateLimit } from '../middleware/validationMiddleware'
-import marketDataRoutes from '../routes/marketDataRoutes'
+import configRoutes from '../routes/configRoutes'
 
 const router = express.Router();
 
 // API ROUTES
-router.use('/api/', validatePayload, setRateLimit(100), marketDataRoutes);
+router.use('/api/', validatePayload, setRateLimit(100), configRoutes);
 
 export default router;
