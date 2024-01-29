@@ -2,15 +2,27 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('configs', {
-      key: {
+    await queryInterface.createTable('assets', {
+      symbol: {
         type: Sequelize.STRING(45),
         allowNull: false,
         primaryKey: true,
       },
-      value: {
+      type: {
+        type: Sequelize.STRING(45),
+        allowNull: true,
+      },
+      name: {
+        type: Sequelize.STRING(45),
+        allowNull: true,
+      },
+      description: {
         type: Sequelize.STRING(255),
-        allowNull: false,
+        allowNull: true,
+      },
+      logoResourcePath: {
+        type: Sequelize.STRING(255),
+        allowNull: true,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -25,15 +37,15 @@ module.exports = {
     });
 
     // Add a unique constraint
-    await queryInterface.addConstraint('configs', {
+    await queryInterface.addConstraint('assets', {
       type: 'unique',
-      fields: ['key'],
-      name: 'key_UNIQUE',
+      fields: ['symbol'],
+      name: 'symbol_UNIQUE',
     });
   },
 
   down: async (queryInterface, Sequelize) => {
     // Drop the table
-    await queryInterface.dropTable('configs');
+    await queryInterface.dropTable('assets');
   },
 };
