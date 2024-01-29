@@ -6,6 +6,8 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import requestIp from 'request-ip';
 import routes from './src/routes'
+import 'dotenv/config';
+import * as path from 'path';
 
 const app = express();
 const server = http.createServer(app); // Create an HTTP server with Express app
@@ -20,6 +22,10 @@ app.use(requestIp.mw());
 
 // Setup Routes
 app.use(routes);
+
+// Serve static assets
+app.use('/assets', express.static(path.join(__dirname, '/src/assets')));
+
 
 // Check that database is authenticated
 sequelize.authenticate()
