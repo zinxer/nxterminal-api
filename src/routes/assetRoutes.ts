@@ -8,60 +8,37 @@ import { promises as fs } from 'fs';
 const router = express.Router();
 
 // Define routes
-router.get('/crypto/:asset', async (req: Request, res: Response) => {
+router.get('/:type/:asset', async (req: Request, res: Response) => {
     const asset = req.params.asset;
-    if (!asset) {
+    const assetType = req.params.type
+
+    if (!asset || !assetType) {
         res.status(400).json({
             success: false,
-            error: { code: errorCodes.ERROR_CODE_INVALID_PARAMS, message: 'Missing mandatory query parameter: asset' }
+            error: { code: errorCodes.ERROR_CODE_INVALID_PARAMS, message: 'Missing mandatory query parameter: /:type/:asset' }
         });
     }
 
-    const filePath = path.join(__dirname, '../assets/crypto', `${asset}.svg`);
-    try {
-        // Check if the file exists
-        await fs.access(filePath);
-    } catch (error) {
-        res.status(404).json(`${asset} logo not available`);
-        return
-    }
-    res.sendFile(filePath);
-});
+    const basePath = path.join(__dirname, `../assets/${assetType}/${asset}`);
 
-router.get('/stock/:asset', async (req: Request, res: Response) => {
-    const asset = req.params.asset;
-    if (!asset) {
-        res.status(400).json({
-            success: false,
-            error: { code: errorCodes.ERROR_CODE_INVALID_PARAMS, message: 'Missing mandatory query parameter: asset' }
-        });
+    // Helper function to check file existence
+    async function fileExists(filePath: string): Promise<boolean> {
+        try {
+            await fs.access(filePath);
+            return true;
+        } catch {
+            return false;
+        }
     }
 
-    const filePath = path.join(__dirname, '../assets/stock', `${asset}.svg`);
-    try {
-        // Check if the file exists
-        await fs.access(filePath);
-    } catch (error) {
-        res.status(404).json(`${asset} logo not available`);
-    }
-    res.sendFile(filePath);
-});
-
-router.get('/forex/:asset', async (req: Request, res: Response) => {
-    const asset = req.params.asset;
-    if (!asset) {
-        res.status(400).json({
-            success: false,
-            error: { code: errorCodes.ERROR_CODE_INVALID_PARAMS, message: 'Missing mandatory query parameter: asset' }
-        });
-    }
-
-    const filePath = path.join(__dirname, '../assets/forex', `${asset}.svg`);
-    try {
-        // Check if the file exists
-        await fs.access(filePath);
-    } catch (error) {
-        res.status(404).json(`${asset} logo not available`);
+    // Check for .svg and .png files
+    let filePath = `${basePath}.svg`;
+    if (!await fileExists(filePath)) {
+        filePath = `${basePath}.png`;
+        if (!await fileExists(filePath)) {
+            res.status(404).json(`/${assetType}/${asset} logo not available`);
+            return
+        }
     }
     res.sendFile(filePath);
 });
