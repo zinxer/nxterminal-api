@@ -6,7 +6,7 @@ import assetsRoutes from '../routes/assetRoutes'
 const router = express.Router();
 
 // API ROUTES
-router.use('/api/', validatePayload, setRateLimit(100), configRoutes);
+router.use('/api/config', validatePayload, setRateLimit(100), configRoutes);
 router.use('/assets', validatePayload, setRateLimit(100), assetsRoutes)
 
 export default router;
