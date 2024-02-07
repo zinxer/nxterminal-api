@@ -13,8 +13,8 @@ export async function getSetupConfig(req: Request, res: Response): Promise<void>
             const key = config.key
             const value = config.value
 
-            if (key === 'API_BASEURL') { configRes['API_BASEURL'] = value }
-            if (key === 'WSS_BASEURL') { configRes['WSS_BASEURL'] = value }
+            if (key === 'HUB_API_BASEURL') { configRes['HUB_API_BASEURL'] = value }
+            if (key === 'HUB_WSS_BASEURL') { configRes['HUB_WSS_BASEURL'] = value }
         }
 
         res.status(200).json({ success: true, data: configRes })
