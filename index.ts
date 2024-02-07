@@ -17,7 +17,6 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(cors());
 app.use(requestIp.mw());
 
 // Setup Routes
@@ -26,6 +25,9 @@ app.use(routes);
 // Serve static assets
 app.use('/assets', express.static(path.join(__dirname, '/src/assets')));
 
+// set Express trust proxy and cors settings based on NODE_ENV
+if (process.env.NODE_ENV === 'production') { app.set('trust proxy', true); app.use(cors({ origin: process.env.HOST })); }
+if (process.env.NODE_ENV === 'development') { app.set('trust proxy', 'loopback'); app.use(cors()); }
 
 // Check that database is authenticated
 sequelize.authenticate()

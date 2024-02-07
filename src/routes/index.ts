@@ -7,6 +7,6 @@ const router = express.Router();
 
 // API ROUTES
 router.use('/api/config', validatePayload, setRateLimit(100), configRoutes);
-router.use('/assets', validatePayload, setRateLimit(100), assetsRoutes)
+router.use('/api/assets', validatePayload, setRateLimit(100), assetsRoutes)
 
 export default router;
