@@ -25,4 +25,6 @@ Config.init(
   }
 );
 
+// As long as the timestamps option is not explicitly set to false in the model options, Sequelize will automatically manage the createdAt and updatedAt fields
+
 export default Config;

@@ -2,8 +2,11 @@ import { Model, DataTypes } from 'sequelize';
 import sequelize from '../../config/database'; // Adjust the import path as needed
 
 class Asset extends Model {
-  public key!: string;
-  public value!: string;
+  public symbol!: string;
+  public type!: string;
+  public name!: string;
+  public description!: string;
+  public logoResourcePath!: string;
 }
 
 Asset.init(
@@ -36,5 +39,7 @@ Asset.init(
     sequelize, // passing the `sequelize` instance is required
   }
 );
+
+// As long as the timestamps option is not explicitly set to false in the model options, Sequelize will automatically manage the createdAt and updatedAt fields
 
 export default Asset;
