@@ -15,13 +15,6 @@ export function validatePayload(req: Request, res: Response, next: NextFunction)
     next();
 }
 
-export function setRateLimit(count: number) {
-    return rateLimit({
-        windowMs: 1 * 60 * 1000, // 1 minute
-        max: count
-    });
-};
-
 export function validateMandatoryParams(params: string[]): (req: Request, res: Response, next: NextFunction) => void {
     return (req, res, next): void => {
         for (const param of params) {
@@ -36,6 +29,29 @@ export function validateMandatoryParams(params: string[]): (req: Request, res: R
         next();
     };
 }
+
+export function validateBrokerApiKey(req: Request, res: Response, next: NextFunction) {
+    const apiKey = req.headers['x-broker-api-key'];
+
+    if (!apiKey) {
+        res.status(401).json({ success: false, message: 'Broker API key is required' });
+        return
+    }
+
+    if (apiKey !== process.env.BROKER_API_KEY) {
+        res.status(403).json({ success: false, message: 'Invalid broker API key' });
+        return
+    }
+
+    next();
+}
+
+export function setRateLimit(count: number) {
+    return rateLimit({
+        windowMs: 1 * 60 * 1000, // 1 minute
+        max: count
+    });
+};
 
 const isParamsSafe = (param: any): boolean => {
     // Whitelisted Characters Allowed in Params
