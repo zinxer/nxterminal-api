@@ -30,7 +30,11 @@ export async function getUserDetails(userId: string) {
     let user = await User.findOne({ where: { id: userId } });
 
     if (user) {
-        return { id: user.id, isActive: user.isActive, createdAt: mysqlDatetimeToEpoch(user.createdAt) }
+        return {
+            id: user.id,
+            isActive: user.isActive,
+            createdAt: mysqlDatetimeToEpoch(user.createdAt)
+        }
     } else {
         return null
     }

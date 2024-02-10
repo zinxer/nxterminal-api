@@ -7,7 +7,7 @@
     "esModuleInterop": true,
     "rootDir": ".",
     "outDir": "build",
-    "types": ["node"],
+    //"types": ["node"],
   },
   "include": [
     "src/**/*.ts",

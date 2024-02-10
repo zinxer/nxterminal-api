@@ -73,7 +73,7 @@ export async function refreshToken(req: Request, res: Response) {
       });
       return
     }
-    insertLog(user.id, actionCodes.ACTION_REFRESH_TOKEN, "Refresh login token", req.clientIp || null)
+    insertLog(user.userId, actionCodes.ACTION_REFRESH_TOKEN, "Refresh login token", req.clientIp || null)
 
     res.json({ accessToken, refreshToken: newRefreshToken });
     return
@@ -93,8 +93,12 @@ async function findUserById(userId: string) {
 
 // Generate JWT tokens
 function generateTokens(payload: any) {
-  const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '1h' });
-  const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '7d' });
+  let accessTokenExpiresIn: Object = { expiresIn: '1h' }
+  let refreshTokenExpiresIn: Object = { expiresIn: '7d' }
+  if (process.env.NODE_ENV === 'development') { accessTokenExpiresIn = {}; refreshTokenExpiresIn = {} }
+
+  const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET!, accessTokenExpiresIn);
+  const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET!, refreshTokenExpiresIn);
   return { accessToken, refreshToken };
 };
 

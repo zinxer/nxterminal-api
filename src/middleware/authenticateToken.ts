@@ -11,7 +11,7 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
             res.sendStatus(403);
             return
         }
-        req.user = user;
+        (req as any).user = user;
         next();
     });
 };
