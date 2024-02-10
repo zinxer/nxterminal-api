@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { updateUserWithRefreshToken } from '../services/userService'
 import * as actionCodes from '../constants/actionCodes'
 import * as errorCodes from '../constants/errorCodes'
-import User from '../models/users'; // Adjust the path as per your project structure
+import User from '../models/users';
 import { insertLog } from '../services/logService'
 
 export async function loginUser(req: Request, res: Response) {

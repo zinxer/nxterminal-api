@@ -1,6 +1,6 @@
 // src/services/userService.ts
 import User from '../models/users';
-import { generateUniqueId, generatePassword, hashPassword } from '../utils/userHelpers';
+import { generateUniqueId, generatePassword, hashPassword, isValidPassword } from '../utils/userHelpers';
 import { mysqlDatetimeToEpoch } from '../utils/utils';
 
 export async function createUniqueUser() {
@@ -14,9 +14,6 @@ export async function createUniqueUser() {
 
     const password = generatePassword();
     const hashedPassword = await hashPassword(password);
-
-    console.log(password, hashedPassword)
-
     await User.create({
         id: userId,
         password: hashedPassword,
@@ -25,6 +22,17 @@ export async function createUniqueUser() {
 
     return { userId, password };
 };
+
+export async function changeUserPassword(userId: string, newPassword: string) {
+    //check if new password is of valid type
+    if (isValidPassword(newPassword)) {
+        const hashedPassword = await hashPassword(newPassword);
+        if (await User.update({ password: hashedPassword }, { where: { id: userId } })) {
+            return true
+        }
+    }
+    return false
+}
 
 export async function getUserDetails(userId: string) {
     let user = await User.findOne({ where: { id: userId } });

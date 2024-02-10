@@ -15,7 +15,7 @@ router.use('/api/assets', validatePayload, setRateLimit(100), assetsRoutes);
 router.use('/api/auth', setRateLimit(100), authRoutes)
 
 // Protected routes
-router.use('/api/user', validatePayload, authenticateToken, setRateLimit(100), userRoutes)
+router.use('/api/user', authenticateToken, setRateLimit(100), userRoutes)
 
 // Broker routes (requires x-broker-api-key)
 router.use('/api/broker', validatePayload, setRateLimit(100), validateBrokerApiKey, brokerRoutes)

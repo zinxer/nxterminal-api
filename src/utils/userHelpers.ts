@@ -19,3 +19,13 @@ export const hashPassword = async (password: string): Promise<string> => {
     const salt = await bcrypt.genSalt(10);
     return bcrypt.hash(password, salt);
 };
+
+export function isValidPassword(password: string): boolean {
+    // Check for at least one letter and one number. Symbols are optional.
+    // ^(?=.*[A-Za-z]) - Asserts that at least one letter exists
+    // (?=.*\d) - Asserts that at least one digit exists
+    // .{8,} - Asserts that the total length is at least 8 characters
+    const regex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+  
+    return regex.test(password);
+  }
