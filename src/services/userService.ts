@@ -36,6 +36,17 @@ export async function changeUserPassword(userId: string, newPassword: string): P
     return false; // Returns false if the password is not valid or no rows were updated
 }
 
+export async function resetNewUserPassword(userId: string) {
+    const password = generatePassword();
+    const hashedPassword = await hashPassword(password);
+    // Attempt to update the user's password
+    const [updatedRows] = await User.update({ password: hashedPassword }, { where: { id: userId } });
+    if (updatedRows > 0) {
+        return password; // Indicates that the update operation affected at least one row
+    }
+    return null
+}
+
 export async function getUserDetails(userId: string) {
     let user = await User.findOne({ where: { id: userId } });
 

@@ -35,7 +35,7 @@ export async function changePassword(req: Request, res: Response) {
             return;
         }
         // log change password action
-        insertLog(user.userId, actionCodes.ACTION_CHANGE_PASSWORD, "User password changed successfully", req.clientIp ?? '')
+        insertLog(user.userId, actionCodes.ACTION_CHANGE_PASSWORD, "User password changed successfully", req.clientIp || null)
         // Success
         res.json({
             success: true,
@@ -65,7 +65,7 @@ export async function getUser(req: Request, res: Response): Promise<void> {
         }
 
         // log get user account details action
-        insertLog(userId, actionCodes.ACTION_GET_USER_DETAILS, `Fetched details for user ${userId}`, req.clientIp ?? '');
+        insertLog(userId, actionCodes.ACTION_GET_USER_DETAILS, `Fetched details for user ${userId}`, req.clientIp || null);
         res.json({ success: true, data: userDetails, message: "User details fetched successfully." });
     } catch (error) {
         console.error("-E- Error fetching user details:", error);
