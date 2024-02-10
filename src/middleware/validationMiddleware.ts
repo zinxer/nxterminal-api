@@ -18,7 +18,7 @@ export function validatePayload(req: Request, res: Response, next: NextFunction)
 export function validateMandatoryParams(params: string[]): (req: Request, res: Response, next: NextFunction) => void {
     return (req, res, next): void => {
         for (const param of params) {
-            if (!req.query[param]) {
+            if (!req.query[param] && !req.body[param]) {
                 res.status(400).json({
                     success: false,
                     error: { code: errorCodes.ERROR_CODE_INVALID_PARAMS, message: 'Missing mandatory query parameter: ' + param }

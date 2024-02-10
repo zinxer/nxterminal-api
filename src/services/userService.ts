@@ -17,7 +17,7 @@ export async function createUniqueUser() {
 
     console.log(password, hashedPassword)
 
-    const newUser = await User.create({
+    await User.create({
         id: userId,
         password: hashedPassword,
         isActive: true,
@@ -30,9 +30,22 @@ export async function getUserDetails(userId: string) {
     let user = await User.findOne({ where: { id: userId } });
 
     if (user) {
-
         return { id: user.id, isActive: user.isActive, createdAt: mysqlDatetimeToEpoch(user.createdAt) }
     } else {
         return null
     }
+}
+
+export async function updateUserWithRefreshToken(userId: string, refreshToken: string) {
+    try {
+        let user = await User.findOne({ where: { id: userId, isActive: true } })
+        if (user) {
+            user.set('refreshToken', refreshToken)
+            await user.save()
+            return user
+        }
+    } catch (error) {
+        console.log("-E-", error)
+    }
+    return null
 }

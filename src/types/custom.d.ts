@@ -5,5 +5,6 @@ import { Request } from 'express';
 declare module 'express-serve-static-core' {
   interface Request {
     clientIp?: string; // Make clientIp optional to ensure compatibility with all requests
+    user?: any
   }
 }
