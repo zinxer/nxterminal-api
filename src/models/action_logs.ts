@@ -1,7 +1,7 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../../config/database'; // Adjust this import based on your Sequelize configuration
 
-class Log extends Model {
+class ActionLog extends Model {
   public id!: number;
   public userId!: number;
   public action!: string;
@@ -9,14 +9,14 @@ class Log extends Model {
   public createdAt!: Date;
 }
 
-Log.init({
+ActionLog.init({
   id: {
     type: DataTypes.INTEGER.UNSIGNED,
     autoIncrement: true,
     primaryKey: true,
   },
   userId: {
-    type: DataTypes.INTEGER.UNSIGNED,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   action: {
@@ -32,8 +32,8 @@ Log.init({
     allowNull: true,
   },
 }, {
-  tableName: 'logs',
+  tableName: 'action_logs',
   sequelize, // passing the `sequelize` instance is required
 });
 
-export default Log;
+export default ActionLog;

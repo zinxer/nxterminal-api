@@ -4,12 +4,12 @@ import { validateMandatoryParams } from '../middleware/validationMiddleware';
 
 const router = express.Router();
 
-// Define GET routes
+// Define POST routes
 router.post('/user', createUser)
 //TODO: router.post('/user/reset', resetUserPassword)
 
-// Define POST routes
-router.get('/user', getUser)
+// Define GET routes
+router.get('/user/:userId', getUser)
 
 
 export default router;

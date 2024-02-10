@@ -1,5 +1,8 @@
 import { Request } from "express";
 
+
+
+/*
 export function getClientIp(req: Request): string {
     // If using `trust proxy` and the `X-Forwarded-For` header exists, `req.ips` will be populated.
     // The client's IP would be the first one in the array.
@@ -20,3 +23,13 @@ export function getClientIp(req: Request): string {
   
     return ip;
   }
+  */
+
+  /**
+ * Converts a MySQL datetime string to epoch time in seconds.
+ * @param {string} mysqlDatetime - The datetime string from MySQL.
+ * @returns {number} Epoch time in seconds.
+ */
+export function mysqlDatetimeToEpoch(mysqlDatetime: Date) {
+  return Math.floor(new Date(mysqlDatetime).getTime() / 1000);
+}

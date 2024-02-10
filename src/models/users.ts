@@ -6,6 +6,7 @@ class User extends Model {
   public password!: string;
   public isActive!: boolean;
   public refreshToken!: string; // Added field for refresh token
+  public createdAt!: Date;
 }
 
 User.init(

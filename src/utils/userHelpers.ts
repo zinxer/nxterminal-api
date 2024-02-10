@@ -3,13 +3,13 @@ import * as crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 
 export const generateUniqueId = (): string => {
-    return crypto.randomBytes(4).toString('hex').toUpperCase().substr(0, 8); // Generates an 8-character ID
+    return crypto.randomBytes(4).toString('hex').toUpperCase().slice(0, 8); // Generates an 8-character ID using slice instead of substr
 };
 
 export const generatePassword = (): string => {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
     let password = '';
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 7; i++) {
         password += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return password;

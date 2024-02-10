@@ -1,11 +1,42 @@
 import { Request, Response } from 'express';
-import insertLog from '../services/logService'
+import { insertLog } from '../services/logService'
 import * as actionCodes from '../constants/actionCodes'
+import { createUniqueUser, getUserDetails } from '../services/userService';
 
+// create user account
 export async function createUser(req: Request, res: Response): Promise<void> {
-
+    try {
+        const { userId, password } = await createUniqueUser();
+        insertLog('broker', actionCodes.ACTION_CREATE_USER, `Created user account ${userId}`, req.clientIp ?? '')
+        // Implement secure password transmission to the user here
+        res.json({ success: true, data: { user: userId, password: password }, message: "User account created successfully." });
+    } catch (error) {
+        console.error("-E- Error creating user:", error);
+        res.status(500).json({ success: false, message: "An error occurred while creating the user." });
+    }
 }
 
+// get user account details
 export async function getUser(req: Request, res: Response): Promise<void> {
-    // TODO: get user account details
+    const userId = req.params.userId; // Assuming you're using a URL parameter to identify the user
+    if (!userId) {
+        res.status(400).json({ success: false, message: "Invalid userId." });
+        return;
+    }
+
+    try {
+        const userDetails = await getUserDetails(userId);
+        if (!userDetails) {
+            res.status(404).json({ success: false, message: "User not found." });
+            return;
+        }
+
+        insertLog('broker', actionCodes.ACTION_GET_USER_DETAILS, `Fetched details for user ${userId}`, req.clientIp ?? '');
+
+        // Depending on what userDetails contains, you might want to filter out sensitive information before sending it back
+        res.json({ success: true, data: userDetails, message: "User details fetched successfully." });
+    } catch (error) {
+        console.error("-E- Error fetching user details:", error);
+        res.status(500).json({ success: false, message: "An error occurred while fetching the user details." });
+    }
 }

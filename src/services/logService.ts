@@ -1,4 +1,4 @@
-import Log from '../models/logs'; // Adjust the import path to where your Log model is defined
+import Log from '../models/action_logs'; // Adjust the import path to where your Log model is defined
 
 /**
  * Inserts a new log entry into the logs table.
@@ -9,7 +9,7 @@ import Log from '../models/logs'; // Adjust the import path to where your Log mo
  * @param ipAddress - The IP address from which the action was performed.
  * @returns The created log entry.
  */
-async function insertLog(userId: number, action: string, details: string, ipAddress: string): Promise<Log> {
+export async function insertLog(userId: string, action: string, details: string | null, ipAddress: string | null): Promise<Log> {
   try {
     const logEntry = await Log.create({
       userId,
@@ -23,7 +23,3 @@ async function insertLog(userId: number, action: string, details: string, ipAddr
     throw error; // Rethrow or handle as appropriate for your application
   }
 }
-
-export default {
-  insertLog,
-};
