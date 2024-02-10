@@ -12,6 +12,8 @@ const router = express.Router();
 // Public routes
 router.use('/api/config', validatePayload, setRateLimit(100), configRoutes);
 router.use('/api/assets', validatePayload, setRateLimit(100), assetsRoutes);
+
+// Auth routes
 router.use('/api/auth', setRateLimit(100), authRoutes)
 
 // Protected routes

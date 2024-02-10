@@ -7,6 +7,8 @@ import { createUniqueUser, getUserDetails } from '../services/userService';
 export async function createUser(req: Request, res: Response): Promise<void> {
     try {
         const { userId, password } = await createUniqueUser();
+
+        // Log broker create user account action
         insertLog('broker', actionCodes.ACTION_CREATE_USER, `Created user account ${userId}`, req.clientIp ?? '')
         // Implement secure password transmission to the user here
         res.json({ success: true, data: { user: userId, password: password }, message: "User account created successfully." });
@@ -31,6 +33,7 @@ export async function getUser(req: Request, res: Response): Promise<void> {
             return;
         }
 
+        // Log broker get user details action
         insertLog('broker', actionCodes.ACTION_GET_USER_DETAILS, `Fetched details for user ${userId}`, req.clientIp ?? '');
 
         // Depending on what userDetails contains, you might want to filter out sensitive information before sending it back

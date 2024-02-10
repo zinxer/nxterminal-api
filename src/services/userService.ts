@@ -23,15 +23,17 @@ export async function createUniqueUser() {
     return { userId, password };
 };
 
-export async function changeUserPassword(userId: string, newPassword: string) {
-    //check if new password is of valid type
+export async function changeUserPassword(userId: string, newPassword: string): Promise<boolean> {
+    // Check if new password is of valid type
     if (isValidPassword(newPassword)) {
         const hashedPassword = await hashPassword(newPassword);
-        if (await User.update({ password: hashedPassword }, { where: { id: userId } })) {
-            return true
+        // Attempt to update the user's password
+        const [updatedRows] = await User.update({ password: hashedPassword }, { where: { id: userId } });
+        if (updatedRows > 0) {
+            return true; // Indicates that the update operation affected at least one row
         }
     }
-    return false
+    return false; // Returns false if the password is not valid or no rows were updated
 }
 
 export async function getUserDetails(userId: string) {

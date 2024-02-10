@@ -34,7 +34,8 @@ export async function changePassword(req: Request, res: Response) {
             res.status(400).json({ success: false, error: { code: errorCodes.ERROR_CODE_INVALID_PASSWORD_SPECS } });
             return;
         }
-
+        // log change password action
+        insertLog(user.userId, actionCodes.ACTION_CHANGE_PASSWORD, "User password changed successfully", req.clientIp ?? '')
         // Success
         res.json({
             success: true,
@@ -63,6 +64,7 @@ export async function getUser(req: Request, res: Response): Promise<void> {
             return;
         }
 
+        // log get user account details action
         insertLog(userId, actionCodes.ACTION_GET_USER_DETAILS, `Fetched details for user ${userId}`, req.clientIp ?? '');
         res.json({ success: true, data: userDetails, message: "User details fetched successfully." });
     } catch (error) {

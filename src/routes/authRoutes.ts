@@ -1,15 +1,16 @@
 import express from 'express';
-import { loginUser, refreshToken } from '../controllers/authController';
+import { loginUser, logoutUser, refreshToken } from '../controllers/authController';
 import { validateMandatoryParams } from '../middleware/validationMiddleware';
+import { authenticateToken } from '../middleware/authenticateToken';
 
 const router = express.Router();
 
 // Define POST routes
 router.post('/login', validateMandatoryParams(['userId', 'password']), loginUser)
-router.post('/token',validateMandatoryParams(['refreshToken']), refreshToken)
 
-// Define GET routes
-//router.get('/user/:userId', getUser)
+router.post('/logout', authenticateToken, logoutUser)
+
+router.post('/token',validateMandatoryParams(['refreshToken']), refreshToken)
 
 
 export default router;

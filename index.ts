@@ -1,5 +1,5 @@
 import http from 'http';
-import express from 'express';
+import express, { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
 import sequelize from './config/database'; // Update the path accordingly
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -13,9 +13,25 @@ const app = express();
 const server = http.createServer(app); // Create an HTTP server with Express app
 const PORT = process.env.PORT || 3000;
 
+// Defining the errorHandler as a function
+function errorHandler(err: any, req: Request, res: Response, next: NextFunction): void {
+  if (err instanceof SyntaxError && (err as any).status === 400 && 'body' in err) {
+    console.error('-E- Bad JSON');
+    res.status(400).send({
+      success: false,
+      error: { code: "INVALID_JSON_FORMAT" },
+      message: "Invalid request format."
+    });
+    return;
+  }
+  next();
+}
+
+
 // Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(errorHandler)
 app.use(cookieParser());
 app.use(requestIp.mw());
 

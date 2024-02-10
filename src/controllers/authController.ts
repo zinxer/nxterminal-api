@@ -6,6 +6,7 @@ import * as actionCodes from '../constants/actionCodes'
 import * as errorCodes from '../constants/errorCodes'
 import User from '../models/users';
 import { insertLog } from '../services/logService'
+import { Op } from 'sequelize';
 
 export async function loginUser(req: Request, res: Response) {
   const { userId, password } = req.body;
@@ -40,6 +41,7 @@ export async function loginUser(req: Request, res: Response) {
       return
     }
 
+    // Log user login action
     insertLog(user.id, actionCodes.ACTION_LOGIN, "User login", req.clientIp || null)
 
     res.json({
@@ -55,12 +57,40 @@ export async function loginUser(req: Request, res: Response) {
   }
 };
 
+export async function logoutUser(req: Request, res: Response) {
+  const userId = (req as any).user.userId
+  // invalidate refresh token so browser/client unable to keep access
+  if (!await invalidateRefreshToken(userId)) {
+    res.status(403).send({
+      success: false,
+      error: { code: errorCodes.ERROR_CODE_USER_ALREADY_LOGGED_OUT }
+    });
+    return
+  }
+  // log logout action
+  insertLog(userId, actionCodes.ACTION_LOGOUT, 'User logout successfully', req.clientIp || null)
+  res.json({
+    success: true,
+    message: "User logged out successfully."
+  })
+}
+
 export async function refreshToken(req: Request, res: Response) {
   const { refreshToken } = req.body;
   if (refreshToken == null) { res.sendStatus(401); return }
 
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!, async (err: any, user: any) => {
     if (err) { res.sendStatus(403); return }
+
+    // Check if the provided refresh token is still valid and present in the DB.
+    const isValidRefreshToken = await checkRefreshTokenInDatabase(user!.userId, refreshToken);
+    if (!isValidRefreshToken) {
+      res.status(403).send({
+        success: false,
+        error: { code: errorCodes.ERROR_CODE_INVALID_REFRESH_TOKEN }
+      });
+      return;
+    }
 
     const { accessToken, refreshToken: newRefreshToken } = generateTokens({ userId: user!.id });
 
@@ -102,3 +132,35 @@ function generateTokens(payload: any) {
   return { accessToken, refreshToken };
 };
 
+async function invalidateRefreshToken(userId: string) {
+  const updatedRows = await User.update({ refreshToken: null }, { where: { id: userId, refreshToken: { [Op.ne]: null } } });
+  if (updatedRows[0] > 0) {
+    return true; // Indicates that the update operation affected at least one row
+  } else {
+    return false; // Indicates that no rows were updated
+  }
+}
+
+/**
+ * Checks if the provided refresh token matches the one stored in the database for the given user ID.
+ * 
+ * @param userId - The ID of the user whose refresh token should be checked.
+ * @param refreshToken - The refresh token to validate.
+ * @returns Promise<boolean> - True if the token matches and is found, false otherwise.
+ */
+async function checkRefreshTokenInDatabase(userId: string, refreshToken: string): Promise<boolean> {
+  try {
+    const user = await User.findOne({
+      where: {
+        id: userId,
+        refreshToken: refreshToken, // Ensure the refreshToken matches the one stored in the database
+        isActive: true
+      },
+    });
+
+    return !!user; // Returns true if the user and token match is found, false otherwise
+  } catch (error) {
+    console.error('Error checking refresh token in database:', error);
+    return false; // Consider the token invalid in case of error
+  }
+}
