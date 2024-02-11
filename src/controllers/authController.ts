@@ -7,6 +7,7 @@ import * as errorCodes from '../constants/errorCodes'
 import User from '../models/users';
 import { insertLog } from '../services/logService'
 import { Op } from 'sequelize';
+import { convertExpiresInToSeconds } from '../utils/authHelpers';
 
 export async function loginUser(req: Request, res: Response) {
   const { userId, password } = req.body;
@@ -30,7 +31,7 @@ export async function loginUser(req: Request, res: Response) {
     }
 
     // User authenticated, generate tokens
-    const { accessToken, refreshToken } = generateTokens({ userId: user.id });
+    const { accessToken, refreshToken, accessTokenExp, refreshTokenExp } = generateTokens({ userId: user.id });
 
     // Save refreshToken with user in DB
     if (await updateUserWithRefreshToken(userId, refreshToken) === null) {
@@ -46,7 +47,7 @@ export async function loginUser(req: Request, res: Response) {
 
     res.json({
       success: true,
-      data: { accessToken: accessToken, refreshToken: refreshToken }
+      data: { accessToken: accessToken, accessTokenExp: accessTokenExp, refreshToken: refreshToken, refreshTokenExp: refreshTokenExp }
     });
   } catch (error) {
     console.error(error);
@@ -92,7 +93,7 @@ export async function refreshToken(req: Request, res: Response) {
       return;
     }
 
-    const { accessToken, refreshToken: newRefreshToken } = generateTokens({ userId: user!.id });
+    const { accessToken, refreshToken: newRefreshToken, accessTokenExp, refreshTokenExp } = generateTokens({ userId: user!.userId });
 
     // Update user with new refresh token in DB
     // Save refreshToken with user in DB
@@ -105,7 +106,7 @@ export async function refreshToken(req: Request, res: Response) {
     }
     insertLog(user.userId, actionCodes.ACTION_REFRESH_TOKEN, "Refresh login token", req.clientIp || null)
 
-    res.json({ accessToken, refreshToken: newRefreshToken });
+    res.json({ success: true, data: { accessToken, accessTokenExp, refreshToken: newRefreshToken, refreshTokenExp } });
     return
   });
 };
@@ -123,14 +124,26 @@ async function findUserById(userId: string) {
 
 // Generate JWT tokens
 function generateTokens(payload: any) {
-  let accessTokenExpiresIn: Object = { expiresIn: '1h' }
-  let refreshTokenExpiresIn: Object = { expiresIn: '7d' }
-  if (process.env.NODE_ENV === 'development') { accessTokenExpiresIn = {}; refreshTokenExpiresIn = {} }
+  let atExpDuration: string = '1h'; // Access token expires in 1 hour
+  let rtExpDuration: string = '7d'; // Refresh token expires in 7 days
+
+  let accessTokenExpiresIn: Object = { expiresIn: atExpDuration };
+  let refreshTokenExpiresIn: Object = { expiresIn: rtExpDuration };
+  if (process.env.NODE_ENV === 'development') {
+    accessTokenExpiresIn = {}; // No expiration in development for access token
+    refreshTokenExpiresIn = {}; // No expiration in development for refresh token
+  }
 
   const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET!, accessTokenExpiresIn);
   const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET!, refreshTokenExpiresIn);
-  return { accessToken, refreshToken };
-};
+
+  // Calculate expiration timestamps based on production or development environment
+  const nowInSeconds: number = Math.floor(Date.now() / 1000);
+  const accessTokenExp: number = nowInSeconds + convertExpiresInToSeconds(process.env.NODE_ENV === 'development' ? '999d' : atExpDuration);
+  const refreshTokenExp: number = nowInSeconds + convertExpiresInToSeconds(process.env.NODE_ENV === 'development' ? '999d' : rtExpDuration);
+
+  return { accessToken, refreshToken, accessTokenExp, refreshTokenExp };
+}
 
 async function invalidateRefreshToken(userId: string) {
   const updatedRows = await User.update({ refreshToken: null }, { where: { id: userId, refreshToken: { [Op.ne]: null } } });
