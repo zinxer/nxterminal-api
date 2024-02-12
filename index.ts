@@ -36,7 +36,7 @@ app.use(cookieParser());
 app.use(requestIp.mw());
 
 // Setup Routes
-app.use(routes);
+app.use('/terminal', routes);
 
 // Serve static assets
 app.use('/assets', express.static(path.join(__dirname, '/src/assets')));
