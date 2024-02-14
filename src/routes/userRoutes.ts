@@ -13,7 +13,7 @@ router.post('/password', validateMandatoryParams(['currentPassword', 'newPasswor
 
 // User settings routes
 router.post('/setting/theme/:theme', setTheme)
-//router.post('/setting/watchlist', validateMandatoryParams(['symbol'], setWatchlist))
+//TODO: router.post('/setting/watchlist', validateMandatoryParams(['symbol'], setWatchlist))
 
 
 export default router;
