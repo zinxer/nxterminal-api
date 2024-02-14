@@ -1,5 +1,6 @@
 // src/services/userService.ts
 import User from '../models/users';
+import UserSetting from '../models/user_settings';
 import { generateUniqueId, generatePassword, hashPassword, isValidPassword } from '../utils/userHelpers';
 import { mysqlDatetimeToEpoch } from '../utils/utils';
 
@@ -58,6 +59,22 @@ export async function getUserDetails(userId: string) {
         }
     } else {
         return null
+    }
+}
+
+export async function getUserSettings(userId: string): Promise<{ [key: string]: any } | null> {
+    const settings = await UserSetting.findAll({
+        where: { userId: userId },
+    });
+
+    if (settings && settings.length > 0) {
+        const settingsObject: { [key: string]: any } = {};
+        settings.forEach(setting => {
+            settingsObject[setting.settingKey] = setting.settingValue;
+        });
+        return settingsObject;
+    } else {
+        return {};
     }
 }
 

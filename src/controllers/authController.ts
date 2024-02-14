@@ -59,7 +59,7 @@ export async function loginUser(req: Request, res: Response) {
 };
 
 export async function logoutUser(req: Request, res: Response) {
-  const userId = (req as any).user.userId
+  const userId = (req as any).user.id
   // invalidate refresh token so browser/client unable to keep access
   if (!await invalidateRefreshToken(userId)) {
     res.status(403).send({
