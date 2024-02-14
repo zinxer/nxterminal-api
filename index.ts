@@ -13,7 +13,10 @@ const app = express();
 
 // Determine CORS options based on NODE_ENV
 const corsOptions = process.env.NODE_ENV === 'development'
-  ? { origin: '*' } // Allow all origins in development
+  ? {
+    origin: process.env.DEV_HOST || "http://localhost:3000",
+    credentials: true, // Needed for sending cookies and auth headers with the request
+  }
   : {
       origin: process.env.HOST, // Only allow requests from specific host in production
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
