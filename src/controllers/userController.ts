@@ -92,7 +92,6 @@ export async function setTheme(req: Request, res: Response): Promise<void> {
     }
 
     try {
-        // Use upsert to either update existing theme setting or insert a new one
         await UserSetting.upsert({
             userId: userId,
             settingKey: 'theme',
@@ -102,6 +101,37 @@ export async function setTheme(req: Request, res: Response): Promise<void> {
         // log get user setting
         insertLog(userId, actionCodes.ACTION_SET_USER_THEME, `Set theme: ${theme} for user ${userId}`, req.clientIp || null);
         res.json({ success: true, data: { theme: theme } });
+    } catch (error) {
+        console.error("-E- Error settings user theme:", error);
+        res.status(500).json({ success: false, error: { code: errorCodes.ERROR_CODE_SERVER_FAILED } });
+    }
+
+}
+
+// set user watchlist settings
+export async function setWatchlist(req: Request, res: Response): Promise<void> {
+    const userId = (req as any).user.id;
+    const symbols = req.body.symbols;
+    if (!userId) {
+        res.status(400).json({ success: false, error: { code: errorCodes.ERROR_CODE_AUTHENTICATION_FAILED } });
+        return;
+    }
+
+    if (!Array.isArray(symbols) || symbols.some(symbol => typeof symbol !== 'string')) {
+        res.status(400).json({ success: false, error: { code: errorCodes.ERROR_CODE_INVALID_PARAMS }, message: `Please specify symbols for watchlist in an array.` });
+        return
+    }
+
+    try {
+        await UserSetting.upsert({
+            userId: userId,
+            settingKey: 'watchlist',
+            settingValue: JSON.stringify(symbols),
+        });
+
+        // log get user setting
+        insertLog(userId, actionCodes.ACTION_SET_USER_THEME, `Set theme: ${JSON.stringify(symbols)} for user ${userId}`, req.clientIp || null);
+        res.json({ success: true, data: { theme: symbols } });
     } catch (error) {
         console.error("-E- Error settings user theme:", error);
         res.status(500).json({ success: false, error: { code: errorCodes.ERROR_CODE_SERVER_FAILED } });

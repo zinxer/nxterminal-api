@@ -13,7 +13,7 @@ class UserSetting extends Model {
 UserSetting.init({
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     userId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         references: { model: 'users', key: 'id' },
         allowNull: false
     },

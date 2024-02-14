@@ -70,7 +70,14 @@ export async function getUserSettings(userId: string): Promise<{ [key: string]: 
     if (settings && settings.length > 0) {
         const settingsObject: { [key: string]: any } = {};
         settings.forEach(setting => {
-            settingsObject[setting.settingKey] = setting.settingValue;
+            try {
+                // Attempt to parse the settingValue as JSON
+                settingsObject[setting.settingKey] = JSON.parse(setting.settingValue);
+            } catch (error) {
+                // If parsing fails, it means settingValue is not a valid JSON string,
+                // so we assign it directly as a string
+                settingsObject[setting.settingKey] = setting.settingValue;
+            }
         });
         return settingsObject;
     } else {
