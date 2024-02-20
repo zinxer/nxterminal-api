@@ -45,7 +45,12 @@ export async function getUser(req: Request, res: Response): Promise<void> {
 }
 
 export async function resetUserPassword(req: Request, res: Response): Promise<void> {
-    const { userId } = req.body;
+    const { userId } = req.params;
+    if (!userId) {
+        res.status(400).json({ success: false, message: "Invalid userId." });
+        return;
+    }
+
     try {
         const newPassword = await resetNewUserPassword(userId)
         if (!newPassword) {

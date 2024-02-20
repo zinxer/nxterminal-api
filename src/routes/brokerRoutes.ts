@@ -6,7 +6,7 @@ const router = express.Router();
 
 // Define POST routes
 router.post('/user', createUser)
-router.post('/user/reset', validateMandatoryParams(['userId']), resetUserPassword)
+router.post('/user/:userId/reset', validateMandatoryParams(['userId']), resetUserPassword)
 
 // Define GET routes
 router.get('/user/:userId', getUser)
