@@ -3,8 +3,7 @@ import User from '../models/users';
 import TradeAccount from '../models/trade_accounts';
 import UserSetting from '../models/user_settings';
 import { generateUniqueId, generatePassword, hashPassword, isValidPassword } from '../utils/userHelpers';
-import { mysqlDatetimeToEpoch } from '../utils/utils';
-import md5 from 'md5'; // Add the import statement for md5 package
+import { mysqlDatetimeToEpoch, generateUid } from '../utils/utils';
 
 export async function createUniqueUser() {
     let userId = generateUniqueId();
@@ -107,12 +106,12 @@ export function getTradeAccount(userId: string, currency: string) {
 
 export async function createTradeAccount(userId: string, currency: string = 'USD') {
     // Assign id as the first 6 characters of md5 hash of userId and epoch time, and regenerate if it already exists in the database
-    const id = md5(userId + Date.now()).substring(0, 6);
+    const id = generateUid([userId])
     const tradeAccount = TradeAccount.findOne({ where: { id: id } });
     // If the trade account already exists, keep egenerating the id and check again until it is unique:
     if (await tradeAccount) {
         return createTradeAccount(userId);
     }
 
-    return TradeAccount.create({ userId: userId, id: id, balance: 0, currency: currency });
+    return TradeAccount.create({ userId: userId, id: id, balance: '0', currency: currency });
 }

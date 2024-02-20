@@ -5,7 +5,7 @@ import sequelize from '../../config/database';
 interface TradeAccountAttributes {
   id: string;
   userId: string;
-  balance: number;
+  balance: string;
   currency: string;
   createdAt?: Date;
   updatedAt?: Date;
@@ -14,7 +14,7 @@ interface TradeAccountAttributes {
 class TradeAccount extends Model<TradeAccountAttributes> implements TradeAccountAttributes {
   declare id: string;
   declare userId: string;
-  declare balance: number;
+  declare balance: string;
   declare currency: string;
   declare readonly createdAt: Date;
   declare readonly updatedAt: Date;

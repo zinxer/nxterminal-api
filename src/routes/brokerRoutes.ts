@@ -8,6 +8,9 @@ const router = express.Router();
 router.post('/user', createUser)
 router.post('/user/:userId/reset', validateMandatoryParams(['userId']), resetUserPassword)
 
+// transaction routes
+
+
 // Define GET routes
 router.get('/user/:userId', getUser)
 

@@ -3,6 +3,7 @@ import { insertLog } from '../services/logService'
 import * as actionCodes from '../constants/actionCodes'
 import { createUniqueUser, getUserDetails, resetNewUserPassword, getTradeAccount, createTradeAccount } from '../services/userService';
 
+
 // create user account
 export async function createUser(req: Request, res: Response): Promise<void> {
     try {
@@ -81,3 +82,4 @@ export async function resetUserPassword(req: Request, res: Response): Promise<vo
         res.status(500).json({ success: false, message: `An error occurred while resetting password for user '${userId}'` });
     }
 }
+

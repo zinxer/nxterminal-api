@@ -5,7 +5,7 @@ import TradeAccount from './trade_accounts';
 
 interface FinancialTransactionAttributes {
   id: string;
-  userId: string;
+  tradeAccId: string;
   type: string;
   amount: string;
   currency: string;
@@ -16,7 +16,7 @@ interface FinancialTransactionAttributes {
 
 class FinancialTransaction extends Model<FinancialTransactionAttributes> implements FinancialTransactionAttributes {
   declare id: string;
-  declare userId: string;
+  declare tradeAccId: string;
   declare type: string;
   declare amount: string;
   declare currency: string;
@@ -27,7 +27,7 @@ class FinancialTransaction extends Model<FinancialTransactionAttributes> impleme
 
 FinancialTransaction.init({
     id: { type: DataTypes.STRING(45), primaryKey: true },
-    userId: { type: DataTypes.STRING(45), allowNull: false },
+    tradeAccId: { type: DataTypes.STRING(45), allowNull: false },
     type: { type: DataTypes.STRING(255), allowNull: false },
     amount: { type: DataTypes.DECIMAL(38, 18), allowNull: false },
     currency: { type: DataTypes.STRING(3), allowNull: false },
@@ -40,7 +40,7 @@ FinancialTransaction.init({
     tableName: 'financial_transactions'
   });
 
-FinancialTransaction.belongsTo(TradeAccount, { foreignKey: 'userId', targetKey: 'userId' });
-TradeAccount.hasMany(FinancialTransaction, { foreignKey: 'userId' });
+FinancialTransaction.belongsTo(TradeAccount, { foreignKey: 'tradeAccId', targetKey: 'id' });
+TradeAccount.hasMany(FinancialTransaction, { foreignKey: 'tradeAccId' });
 
 export default FinancialTransaction;

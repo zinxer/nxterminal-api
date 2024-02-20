@@ -53,6 +53,7 @@ export function setRateLimit(count: number) {
     });
 };
 
+
 const isParamsSafe = (param: any): boolean => {
     // Whitelisted Characters Allowed in Params
     const regex = /^[A-Za-z0-9 \/,@&_:.%$#*=-]*$/;
