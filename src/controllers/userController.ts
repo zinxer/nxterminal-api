@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import * as actionCodes from '../constants/actionCodes'
 import * as errorCodes from '../constants/errorCodes'
-import { changeUserPassword, getUserDetails, getUserSettings } from '../services/userService';
+import { changeUserPassword, getUserDetails, getUserSettings, getTradeAccount, createTradeAccount } from '../services/userService';
 import { insertLog } from '../services/logService'
 import User from '../models/users';
 import UserSetting from '../models/user_settings';
@@ -67,6 +67,12 @@ export async function getUser(req: Request, res: Response): Promise<void> {
 
         const userSettings = await getUserSettings(userId);
         (userDetails as any)['settings'] = userSettings
+
+        // check if user already has trade accounts generated in trade_account table if not create one
+        const tradeAccount = await getTradeAccount(userId, 'USD');
+        if (!tradeAccount) {
+            await createTradeAccount(userId, 'USD');
+        }
 
         // log get user account details action
         insertLog(userId, actionCodes.ACTION_GET_USER_DETAILS, `Fetched details for user ${userId}`, req.clientIp || null);
