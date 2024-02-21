@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { insertLog } from '../services/logService'
 import * as actionCodes from '../constants/actionCodes'
 import { createUniqueUser, getUserDetails, resetNewUserPassword, getTradeAccount, createTradeAccount } from '../services/userService';
+import TradeAccount from '../models/trade_accounts';
+import FinancialTransaction from '../models/financial_transactions';
 
 
 // create user account
@@ -28,10 +30,6 @@ export async function createUser(req: Request, res: Response): Promise<void> {
 // get user account details
 export async function getUser(req: Request, res: Response): Promise<void> {
     const userId = req.params.userId; // Assuming you're using a URL parameter to identify the user
-    if (!userId) {
-        res.status(400).json({ success: false, message: "Invalid userId." });
-        return;
-    }
 
     try {
         const userDetails = await getUserDetails(userId, true);
@@ -83,3 +81,62 @@ export async function resetUserPassword(req: Request, res: Response): Promise<vo
     }
 }
 
+
+export async function getFinanceTxns(req: Request, res: Response): Promise<void> {
+    const { currency, userId } = req.params;
+    const limit = parseInt(req.query.limit as string) || 50;
+    const offset = parseInt(req.query.offset as string) || 0;
+
+    let queryOptions: any = {
+        where: {},
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']]
+    };
+
+    // set a limit of 1000 to avoid fetching too many records
+    if (limit > 1000) {
+        res.status(400).json({ success: false, message: "Limit too high. Maximum limit is 1000." });
+        return;
+    }
+
+    if (currency) {
+        queryOptions.where.currency = currency;
+    }
+
+    // if userId is provided then fetch transactions for that user which includes all trade accounts of that user
+    if (userId) {
+        //find the trade accounts for the user
+        const tradeAccounts = await TradeAccount.findAll({ where: { userId } });
+        if (tradeAccounts.length === 0) {
+            res.status(404).json({ success: false, message: "User not found." });
+            return;
+        }
+        queryOptions.where.tradeAccId = tradeAccounts.map((acc: any) => acc.id);
+    }
+    try {
+        const financeTxns = await FinancialTransaction.findAndCountAll(queryOptions);
+
+        // change createdAt to epoch and remove updatedAt
+        (financeTxns as any).rows = financeTxns.rows.map((txn: any) => {
+            return {
+                id: txn.id,
+                tradeAccId: txn.tradeAccId,
+                type: txn.type,
+                amount: txn.amount,
+                currency: txn.currency,
+                status: txn.status,
+                datetime: txn.createdAt.getTime()
+            }
+        });
+
+        // Log broker get financial transactions action, with currency if provided and userId if provided
+        let logParams = currency ? `currency ${currency}` : userId ? `userId ${userId}` : 'all';
+        insertLog('broker', actionCodes.ACTION_GET_FINANCE_TXNS, `Fetched financial transactions for ${logParams}`, req.clientIp || null);
+
+        res.json({ success: true, data: financeTxns, message: "Financial transactions fetched successfully." });
+    } catch (error) {
+        console.error("-E- Error fetching financial transactions:", error);
+        res.status(500).json({ success: false, message: "An error occurred while fetching the financial transactions." });
+    }
+}

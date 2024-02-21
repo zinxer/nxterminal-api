@@ -9,6 +9,7 @@ export const ACTION_GET_USER_DETAILS = 'GET_USER_DETAILS'
 export const ACTION_CHANGE_PASSWORD = 'CHANGE_PASSWORD'
 export const ACTION_RESET_PASSWORD = 'RESET_PASSWORD'
 export const ACTION_SET_USER_THEME = 'SET_USER_THEME'
+export const ACTION_GET_FINANCE_TXNS = 'GET_FINANCE_TXNS'
 
 export default ACTION_DEFAULT
 // Add more error codes as needed
