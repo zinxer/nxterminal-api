@@ -1,6 +1,7 @@
 // models/trade_accounts.ts
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../../config/database';
+import User from './users';
 
 interface TradeAccountAttributes {
   id: string;
@@ -32,5 +33,9 @@ TradeAccount.init({
   modelName: 'TradeAccount',
   tableName: 'trade_accounts'
 });
+
+// Define Associations
+TradeAccount.belongsTo(User, { foreignKey: 'userId', targetKey: 'id' });
+User.hasMany(TradeAccount, { foreignKey: 'userId' });
 
 export default TradeAccount;

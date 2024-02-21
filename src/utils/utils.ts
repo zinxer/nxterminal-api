@@ -26,11 +26,11 @@ export function getClientIp(req: Request): string {
   }
   */
 
-  /**
- * Converts a MySQL datetime string to epoch time in seconds.
- * @param {string} mysqlDatetime - The datetime string from MySQL.
- * @returns {number} Epoch time in seconds.
- */
+/**
+* Converts a MySQL datetime string to epoch time in seconds.
+* @param {string} mysqlDatetime - The datetime string from MySQL.
+* @returns {number} Epoch time in seconds.
+*/
 export function mysqlDatetimeToEpoch(mysqlDatetime: Date) {
   return Math.floor(new Date(mysqlDatetime).getTime() / 1000);
 }
@@ -39,14 +39,18 @@ export function generateUid(array: string[]): string {
   return md5(array.join('') + Date.now()).substring(0, 6);
 }
 
+export function generateTradeAccountId(userId: string, currency: string) {
+  return md5(userId + currency).substring(0, 6);
+}
+
 export function generateTxUid(array: string[], type: string) {
   // Generate a unique transaction ID using the array of strings and the current time in seconds to prevent collisions
 
-  if(type === 'financial_transactions'){
+  if (type === 'financial_transactions') {
     return 'f' + md5(array.join('') + Math.floor(Date.now() / 1000)).substring(0, 11);
-  }else if (type === 'trade_transactions'){
+  } else if (type === 'trade_transactions') {
     return 't' + md5(array.join('') + Math.floor(Date.now() / 1000)).substring(0, 11);
-  }else{
+  } else {
     return 'u' + md5(array.join('') + Math.floor(Date.now() / 1000)).substring(0, 11);
   }
 }

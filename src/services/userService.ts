@@ -3,7 +3,7 @@ import User from '../models/users';
 import TradeAccount from '../models/trade_accounts';
 import UserSetting from '../models/user_settings';
 import { generateUniqueId, generatePassword, hashPassword, isValidPassword } from '../utils/userHelpers';
-import { mysqlDatetimeToEpoch, generateUid } from '../utils/utils';
+import { mysqlDatetimeToEpoch, generateTradeAccountId } from '../utils/utils';
 
 export async function createUniqueUser() {
     let userId = generateUniqueId();
@@ -49,11 +49,12 @@ export async function resetNewUserPassword(userId: string) {
     return null
 }
 
-export async function getUserDetails(userId: string) {
-    let user = await User.findOne({ where: { id: userId } });
+export async function getUserDetails(userId: string, extend: Boolean = true) {
+    let user = extend ? await User.findOne({ where: { id: userId }, include: TradeAccount }) : await User.findOne({ where: { id: userId } });
 
+    let modifiedResponse = {}
     if (user) {
-        return {
+        modifiedResponse = {
             id: user.id,
             isActive: user.isActive,
             createdAt: mysqlDatetimeToEpoch(user.createdAt)
@@ -61,6 +62,20 @@ export async function getUserDetails(userId: string) {
     } else {
         return null
     }
+
+    if (extend) {
+        (user as any).TradeAccounts.forEach((account: TradeAccount) => {
+            const currency = account.currency as string;
+            (modifiedResponse as any)[currency] = {
+                tradeAccId: account.id,
+                balance: account.balance,
+                createdAt: mysqlDatetimeToEpoch(account.createdAt),
+                updatedAt: mysqlDatetimeToEpoch(account.updatedAt)
+            }
+
+        });
+    }
+    return modifiedResponse
 }
 
 export async function getUserSettings(userId: string): Promise<{ [key: string]: any } | null> {
@@ -106,7 +121,7 @@ export function getTradeAccount(userId: string, currency: string) {
 
 export async function createTradeAccount(userId: string, currency: string = 'USD') {
     // Assign id as the first 6 characters of md5 hash of userId and epoch time, and regenerate if it already exists in the database
-    const id = generateUid([userId])
+    const id = generateTradeAccountId(userId, currency)
     const tradeAccount = TradeAccount.findOne({ where: { id: id } });
     // If the trade account already exists, keep egenerating the id and check again until it is unique:
     if (await tradeAccount) {

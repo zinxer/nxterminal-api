@@ -1,3 +1,4 @@
+// models/user.ts
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../../config/database'; // Adjust the import path as needed
 

@@ -34,7 +34,7 @@ export async function getUser(req: Request, res: Response): Promise<void> {
     }
 
     try {
-        const userDetails = await getUserDetails(userId);
+        const userDetails = await getUserDetails(userId, true);
         if (!userDetails) {
             res.status(404).json({ success: false, message: "User not found." });
             return;
