@@ -131,7 +131,16 @@ export async function getFinanceTxns(req: Request, res: Response): Promise<void>
         });
 
         // Log broker get financial transactions action, with currency if provided and userId if provided
-        let logParams = currency ? `currency ${currency}` : userId ? `userId ${userId}` : 'all';
+        let logParams = '';
+        if (currency && userId) {
+            logParams = `currency ${currency} and userId ${userId}`;
+        } else if (currency) {
+            logParams = `currency ${currency}`;
+        } else if (userId) {
+            logParams = `userId ${userId}`;
+        } else {
+            logParams = 'all';
+        }
         insertLog('broker', actionCodes.ACTION_GET_FINANCE_TXNS, `Fetched financial transactions for ${logParams}`, req.clientIp || null);
 
         res.json({ success: true, data: financeTxns, message: "Financial transactions fetched successfully." });
