@@ -2,8 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 import rateLimit from "express-rate-limit";
 import * as errorCodes from '../constants/errorCodes'
 
-// Comment the following block if you want to disable the request payload validation.
 export function validatePayload(req: Request, res: Response, next: NextFunction): void {
+    sanitizeInput(JSON.stringify(req.body));
+    sanitizeInput(JSON.stringify(req.params));
+    sanitizeInput(JSON.stringify(req.query));
+
     if (!isParamsSafe(req.body) || !isParamsSafe(req.params) || !isParamsSafe(req.query)) {
         console.log("Suspicious Payload In Route: " + req.url);
         res.status(401).json({
@@ -73,6 +76,13 @@ const isParamsSafe = (param: any): boolean => {
         }
     }
     return true;
+};
+
+const sanitizeInput = (input: string): string => {
+    // Sanitize input to prevent SQL injection
+    const sanitizedInput = input.replace(/'/g, "''");
+
+    return sanitizedInput;
 };
 
 const isValidJSONString = (str: string): boolean => {
