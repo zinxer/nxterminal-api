@@ -3,6 +3,19 @@ build
 coverage
 .vscode
 .DS_STORE
-.env
 tmp
 config/config.json
+
+# Secret guard
+bin/test.js
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.keystore
+keystore/
+*.dump
+*.bak
+secrets/
