@@ -1,4 +1,8 @@
 {
+  "name": "nxterminal-api",
+  "version": "0.1.0",
+  "description": "Backend API of the NXtrader trading terminal",
+  "license": "MIT",
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/body-parser": "^1.19.5",
@@ -30,11 +34,9 @@
     "axios": "^1.6.5",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
-    "bignumber.js": "^9.1.2",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "cryptocurrency-icons": "^0.18.1",
     "dotenv": "^16.3.2",
     "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
